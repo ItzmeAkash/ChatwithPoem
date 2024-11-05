@@ -10,10 +10,7 @@ from langchain_groq import ChatGroq
 # Load environment variables from .env file
 load_dotenv()
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-# Setup the Environment Variables
-os.environ["GROQ_API_KEY"] = GROQ_API_KEY
 
 # To fetch the directory
 working_dir = os.path.dirname(os.path.abspath(__file__))
@@ -27,7 +24,7 @@ def vector_store():
 
 # Create a Conversational Chain with Memory
 def conversational_chain(vectorstore):
-    llm = ChatGroq(model="llama-3.1-70b-versatile", temperature=0)
+    llm = ChatGroq(model="llama-3.1-70b-versatile", temperature=0, api_key=os.getenv("GROQ_API_KEY"))
     retriever = vectorstore.as_retriever()
     
     memory = ConversationBufferMemory(llm=llm, output_key="answer", memory_key="chat_history", return_messages=True)
