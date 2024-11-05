@@ -2,6 +2,7 @@ langchain-community==0.2.16
 langchain-text-splitters==0.2.4
 langchain-huggingface==0.0.3
 langchain-chroma==0.1.3
+GROQ_API_KEY = "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"
 langchain-groq==0.1.9
 unstructured==0.15.0
 unstructured[pdf]==0.15.0
