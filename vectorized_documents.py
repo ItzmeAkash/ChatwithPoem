@@ -1,29 +1,36 @@
-from langchain_community.document_loaders import UnstructuredFileLoader
-from langchain_community.document_loaders import DirectoryLoader
-from langchain_text_splitters import CharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_chroma import Chroma
+from langchain_core.documents import Document
+from langchain.document_loaders import UnstructuredFileLoader, DirectoryLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.embeddings.huggingface import HuggingFaceEmbeddings
+from langchain.vectorstores.pgvector import PGVector
 
-import nltk
-nltk.download('averaged_perceptron_tagger')
-
-#loading the embedding models
+# Initialize the embedding model
 embeddings = HuggingFaceEmbeddings()
 
-#loading the Data from  Directory
-loader = DirectoryLoader(path="poemsTxtFile",glob="./*.txt",loader_cls=UnstructuredFileLoader)
+# Load data from the directory
+loader = DirectoryLoader(path="poemsTxtFile", glob="*.txt", loader_cls=UnstructuredFileLoader)
 
-# loading the Document
-documents  = loader.load()
+# Load the documents
+documents = loader.load()
 
-text_spliter = CharacterTextSplitter(chunk_size=2000,chunk_overlap=500)
+# Initialize the text splitter
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=500)
 
-text_chunks = text_spliter.split_documents(documents)
+# Split the documents into chunks
+text_chunks = text_splitter.split_documents(documents)
 
-vectordb = Chroma.from_documents(
-    documents=text_chunks,
+# Define the connection string and collection name
+CONNECTION_STRING = "postgresql+psycopg2://postgres:admin@localhost:5432/vectordb"
+COLLECTION_NAME = "poems_vector"
+
+
+
+# Initialize the PGVector vector store
+vector_store = PGVector.from_documents(
     embedding=embeddings,
-    persist_directory="vector_db"
-)
+    documents=text_chunks,
+    collection_name=COLLECTION_NAME,
+    connection_string=CONNECTION_STRING)
 
-print("Documents Vectorized")
+print("Vector store creation complete.")
+
